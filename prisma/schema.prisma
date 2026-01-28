@@ -14,18 +14,35 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String     @id @default(uuid())
   name          String
-  email         String
-  emailVerified Boolean   @default(false)
+  email         String     @unique
+  emailVerified Boolean    @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
+  role          Role       @default(customer)
+  status        UserStatus @default(ACTIVE)
 
-  @@unique([email])
+  sessions Session[]
+  accounts Account[]
+  orders   Order[]
+  provider Provider?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reviews   Review[]
+
   @@map("user")
+}
+
+enum Role {
+  customer
+  provider
+  admin
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
 }
 
 model Session {
@@ -74,4 +91,111 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Food {
+  id          String  @id @default(uuid())
+  name        String
+  description String
+  calories    String
+  image       String
+  popular     Boolean @default(false)
+  price       Float
+  offer       Float?
+
+  providerId String
+  provider   Provider @relation(fields: [providerId], references: [id])
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  reviews    Review[]
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("food")
+}
+
+model Order {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  status     Status @default(PREPARING)
+  totalPrice Float
+  address    String
+
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("order")
+}
+
+model Provider {
+  id          String @id @default(uuid())
+  name        String
+  description String
+  phone       String
+  address     String
+  email       String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  foods Food[]
+
+  bannerImage String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("provider")
+}
+
+model Category {
+  id    String @id @default(uuid())
+  name  String @unique
+  foods Food[]
+
+  @@map("category")
+}
+
+model OrderItem {
+  id       String @id @default(uuid())
+  orderId  String
+  foodId   String
+  quantity Int
+  price    Float
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  food  Food  @relation(fields: [foodId], references: [id])
+
+  @@map("order_item")
+}
+
+model Review {
+  id      String  @id @default(uuid())
+  rating  Int
+  comment String?
+
+  userId String
+  foodId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  food Food @relation(fields: [foodId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, foodId])
+  @@map("review")
+}
+
+enum Status {
+  PREPARING
+  READY
+  DELIVERED
+  CANCELLED
 }

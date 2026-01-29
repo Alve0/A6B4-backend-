@@ -6,6 +6,7 @@ import { auth } from "./lib/auth";
 import { foodsRoutes } from "./modules/foods/foods.routes";
 import { errorHandler } from "./middlewares/globalError";
 import { notFound } from "./middlewares/notFound";
+import { providerRouter } from "./modules/provider/provider.routes";
 
 dotenv.config();
 
@@ -24,6 +25,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/foods", foodsRoutes);
+
+app.use("/api/providers", providerRouter);
 
 app.use(notFound);
 

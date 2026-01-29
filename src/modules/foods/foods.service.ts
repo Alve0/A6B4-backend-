@@ -1,4 +1,4 @@
-import { Food } from "../../../generated/prisma/client";
+import { Category, Food } from "../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 
 async function postFood(data: Food) {
@@ -6,4 +6,9 @@ async function postFood(data: Food) {
   return result;
 }
 
-export const foodsService = { postFood };
+async function createCategory(data: Category) {
+  const result = await prisma.category.create({ data });
+  return result;
+}
+
+export const foodsService = { postFood, createCategory };

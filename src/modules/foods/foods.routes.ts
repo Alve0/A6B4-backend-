@@ -1,8 +1,15 @@
 import { Router } from "express";
 import { foodsController } from "./foods.controller";
+import { requireRole } from "../../middlewares/role";
 
 const router = Router();
 
-router.post("/",  foodsController.postFood); 
+router.post(
+  "/category",
+  requireRole(["admin"]),
+  foodsController.createCategory,
+);
 
-export const foodsRoutes =  router;
+router.post("/", requireRole(["admin", "provider"]), foodsController.postFood);
+
+export const foodsRoutes = router;

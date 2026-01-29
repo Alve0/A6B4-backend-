@@ -3,6 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth";
+import { foodsRoutes } from "./modules/foods/foods.routes";
+import { errorHandler } from "./middlewares/globalError";
+import { notFound } from "./middlewares/notFound";
 
 dotenv.config();
 
@@ -20,12 +23,9 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-    path: req.path,
-  });
-});
+app.use("/api/foods", foodsRoutes);
 
+app.use(notFound);
+
+app.use(errorHandler);
 export { app };

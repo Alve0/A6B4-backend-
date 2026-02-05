@@ -1,4 +1,4 @@
-import { Prisma } from "../../generated/prisma/client";
+import { Prisma } from "../generated/prisma/client";
 
 export function errorHandler(err: any, _req: any, res: any, _next: any) {
   console.error("🔥 Error:", err);

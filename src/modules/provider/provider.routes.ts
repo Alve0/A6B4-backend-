@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { providerService } from "./provider.service";
+
 import { providerController } from "./provider.contoller";
 import { requireRole } from "../../middlewares/role";
 

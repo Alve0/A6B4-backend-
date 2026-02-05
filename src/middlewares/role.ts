@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { auth } from "../lib/auth";
-import { Role } from "../../generated/prisma/enums";
+import { auth } from "../lib/auth.js";
+import { Role } from "../generated/prisma/enums.js";
 export const requireRole =
   (roles: Role[]) =>
   async (req: Request, res: Response, next: NextFunction) => {

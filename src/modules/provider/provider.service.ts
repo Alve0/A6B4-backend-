@@ -1,6 +1,6 @@
 import { Request } from "express";
-import { Provider } from "../../../generated/prisma/client";
-import { auth } from "../../lib/auth";
+import { Provider } from "../../generated/prisma/client";
+
 import { prisma } from "../../lib/prisma";
 
 async function createProvider(data: Provider) {

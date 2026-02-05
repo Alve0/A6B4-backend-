@@ -11,5 +11,6 @@ router.post(
 );
 
 router.post("/", requireRole(["admin", "provider"]), foodsController.postFood);
+router.get("/:id", foodsController.getFood);
 
 export const foodsRoutes = router;

@@ -1,0 +1,38 @@
+model Cart {
+    id String @id @default(uuid())
+
+    customer Customer @relation(fields: [customerId], references: [id])
+    food     Food     @relation(fields: [foodId], references: [id])
+    provider Provider @relation(fields: [providerId], references: [id])
+
+    customerId String @unique
+    foodId     String @unique
+    providerId String @unique
+
+    quantity        Int @db.SmallInt
+    sub_total_price Int @db.SmallInt
+    vat             Int @db.SmallInt
+    total_price     Int @db.SmallInt
+    delivary_fee    Int @db.SmallInt
+
+    createdAt DateTime @db.Timestamptz()
+    updatedAt DateTime @db.Timestamptz()
+
+    @@index([id, customerId, foodId, providerId])
+    @@map("cart")
+}
+
+model Order {
+    id           String       @id @default(uuid())
+    rider        Rider?       @relation(fields: [riderID], references: [id])
+    riderID      String?      @unique
+    order_status ORDER_STATUS @default(PREPARING)
+
+    review Review[]
+
+    createdAt DateTime @db.Timestamptz()
+    updatedAt DateTime @db.Timestamptz()
+
+    @@index([id])
+    @@map("order")
+}

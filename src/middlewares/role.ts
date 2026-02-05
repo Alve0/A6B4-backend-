@@ -1,8 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
 import { auth } from "../lib/auth.js";
-import { Role } from "../generated/prisma/enums.js";
+import { ROLE } from "../generated/prisma/enums.js";
+
 export const requireRole =
-  (roles: Role[]) =>
+  (roles: ROLE[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const session = await auth.api.getSession({
@@ -13,7 +14,7 @@ export const requireRole =
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      if (!roles.includes(session.user.role as Role)) {
+      if (!roles.includes(session.user.role as ROLE)) {
         return res.status(403).json({ message: "Forbidden" });
       }
 

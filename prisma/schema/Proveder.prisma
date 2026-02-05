@@ -1,0 +1,33 @@
+model Provider {
+    id           String @id @default(uuid())
+    user         User   @relation(references: [id], fields: [userId])
+    userId       String @unique
+    title        String @db.VarChar(100)
+    discription  String @db.VarChar(500)
+    logo_image   String @db.VarChar(100)
+    banner_image String @db.VarChar(100)
+    address      String @db.VarChar(100)
+    phone        String @unique @db.VarChar(50)
+
+    cart Cart[]
+
+    createdAt DateTime @db.Timestamptz()
+    updatedAt DateTime @db.Timestamptz()
+
+    @@index([id, userId, phone])
+    @@map("provider")
+}
+
+model Review {
+    id          String @id @default(uuid())
+    order       Order  @relation(fields: [orderId], references: [id])
+    orderId     String @unique
+    rating      Int    @db.SmallInt
+    discription String @db.VarChar(500)
+
+    createdAt DateTime @db.Timestamptz()
+    updatedAt DateTime @db.Timestamptz()
+
+    @@index([id])
+    @@map("review")
+}

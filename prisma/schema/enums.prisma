@@ -1,0 +1,14 @@
+enum ROLE {
+    admin
+    customer
+    provider
+    rider
+}
+
+enum ORDER_STATUS {
+    PREPARING
+    READY
+    ON_THE_WAY
+    DELIVERED
+    CANCLLED
+}

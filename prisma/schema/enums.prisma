@@ -12,3 +12,10 @@ enum ORDER_STATUS {
     DELIVERED
     CANCLLED
 }
+
+enum STATUS {
+    PENDING
+    APPROVED
+    BLOCKED
+    CANCLE
+}

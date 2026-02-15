@@ -8,8 +8,8 @@ model Provider {
     banner_image String @db.VarChar(100)
     address      String @db.VarChar(100)
     phone        String @unique @db.VarChar(50)
-
-    cart Cart[]
+    status       STATUS @default(PENDING)
+    cart         Cart[]
 
     createdAt DateTime @db.Timestamptz()
     updatedAt DateTime @db.Timestamptz()
@@ -24,6 +24,7 @@ model Review {
     orderId     String @unique
     rating      Int    @db.SmallInt
     discription String @db.VarChar(500)
+    status      STATUS @default(APPROVED)
 
     createdAt DateTime @db.Timestamptz()
     updatedAt DateTime @db.Timestamptz()

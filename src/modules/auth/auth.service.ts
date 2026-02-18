@@ -4,20 +4,41 @@ import { ILogin, IRegister } from "../../lib/type";
 import { prisma } from "../../lib/prisma";
 
 async function register(params: IRegister) {
-  const data = await auth.api.signUpEmail({
-    body: {
-      name: params.name,
+  const existingUser = await prisma.user.findUnique({
+    where: {
       email: params.email,
-      password: params.password,
-      role: params.role || "customer",
     },
   });
 
-  if (!data.user) {
-    throw error("user not created");
+  if (existingUser) {
+    throw new Error("Email already exists");
   }
+  try {
+    const data = await auth.api.signUpEmail({
+      body: {
+        name: params.name,
+        email: params.email,
+        password: params.password,
+        role: "customer",
+      },
+    });
+    if (!data.user) {
+      throw new Error("user not created");
+    }
 
-  return data;
+    try {
+      const customer = await prisma.customer.create({
+        data: {
+          userId: data.user.id as string,
+        },
+      });
+      return { data, customer };
+    } catch (err) {
+      throw new Error("Failed to create customer in database");
+    }
+  } catch (err) {
+    throw new Error("Failed to create user");
+  }
 }
 
 async function login(params: ILogin) {

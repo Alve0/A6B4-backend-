@@ -40,6 +40,10 @@ function errorHandler(
       statusCode = 400;
       errorMessage = "Can't reach database server";
     }
+  } else if (err instanceof Error) {
+    statusCode = 400;
+    errorMessage = err.message;
+    errorDetails = err.stack;
   }
 
   res.status(statusCode);

@@ -1,57 +1,23 @@
-import { error } from "node:console";
-import { auth } from "../../lib/auth";
-import { ILogin, IRegister } from "../../lib/type";
 import { prisma } from "../../lib/prisma";
+import { ISessionWithUser } from "./interface";
 
-async function register(params: IRegister) {
-  const existingUser = await prisma.user.findUnique({
+const GoogleLogin = async (sessonToken: ISessionWithUser) => {
+  const customer = await prisma.customer.findUnique({
     where: {
-      email: params.email,
+      userId: sessonToken.session.userId,
     },
   });
-
-  if (existingUser) {
-    throw new Error("Email already exists");
-  }
-  try {
-    const data = await auth.api.signUpEmail({
-      body: {
-        name: params.name,
-        email: params.email,
-        password: params.password,
-        role: "customer",
+  if (!customer) {
+    const newCustomer = await prisma.customer.create({
+      data: {
+        userId: sessonToken.session.userId,
       },
     });
-    if (!data.user) {
-      throw new Error("user not created");
-    }
-
-    try {
-      const customer = await prisma.customer.create({
-        data: {
-          userId: data.user.id as string,
-        },
-      });
-      return { data, customer };
-    } catch (err) {
-      throw new Error("Failed to create customer in database");
-    }
-  } catch (err) {
-    throw new Error("Failed to create user");
+    return newCustomer;
   }
-}
+  return customer;
+};
 
-async function login(params: ILogin) {
-  const data = await auth.api.signInEmail({
-    body: params,
-  });
-
-  return data;
-}
-
-async function getAllUser() {
-  const result = await prisma.user.findMany();
-  return result;
-}
-
-export const authService = { register, getAllUser, login };
+export const authService = {
+  GoogleLogin,
+};

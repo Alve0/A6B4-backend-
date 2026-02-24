@@ -5,6 +5,7 @@ import { prisma } from "./prisma";
 import { ROLE } from "../generated/prisma/enums";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
   database: prismaAdapter(prisma, {
     provider: "postgresql", // or "mysql", "postgresql", ...etc
   }),

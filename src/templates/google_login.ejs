@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Login</title>
+  </head>
+  <body>
+    <div>
+      <p>Redirecting to Google login...</p>
+    </div>
+  </body>
+  <script>
+    async function google() {
+      try {
+        const response = await fetch(
+          "<%= BETTER_AUTH_URL %>/api/auth/sign-in/social",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              provider: "google",
+              callbackURL: "<%= CALLBACK_URL %>",
+            }),
+          },
+        );
+
+        const data = await response.json();
+
+        if (!data?.url) {
+          document.body.innerHTML = `
+          <div>
+              <h2>Google Login Error</h2>
+              <p>Failed to get Google login URL.</p>
+          </div>
+        `;
+        } else {
+          window.location.href = data.url;
+        }
+      } catch (e) {
+        document.body.innerHTML = `
+        <div>
+          <h2>Google Login Error</h2>
+          <p>Failed to redirect to Google login page.</p>
+        </div>
+      `;
+      }
+    }
+
+    google();
+  </script>
+</html>

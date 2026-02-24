@@ -1,14 +1,46 @@
 import { Request, Response } from "express";
 import { catchAsync, sendResponse } from "../../lib/utils";
 import { authService } from "./auth.service";
-import { success } from "better-auth";
+
 import { auth } from "../../lib/auth";
+
+import { ILoginData, IRegisterData } from "./interface";
+
+const Register = catchAsync(async (req: Request, res: Response) => {
+  const data: IRegisterData = req.body;
+
+  const result = await authService.Register(data);
+  if (!result.customer.userId) {
+    sendResponse(res, {
+      httpStatusCode: 400,
+      success: false,
+      message: "Failed to register user",
+    });
+  }
+  sendResponse(res, {
+    httpStatusCode: 200,
+    success: true,
+    message: "User registered successfully",
+    data: result,
+  });
+});
+
+const Login = catchAsync(async (req: Request, res: Response) => {
+  const data: ILoginData = req.body;
+  const result = await authService.Login(data);
+  sendResponse(res, {
+    httpStatusCode: 200,
+    success: true,
+    message: "User logged in successfully",
+    data: result,
+  });
+});
 
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
   const redirectURl = req.query.redirect || "/";
   const encodedRedirectURL = encodeURIComponent(redirectURl as string);
   const CALLBACK_URL = `${process.env.BETTER_AUTH_URL}/api/v1/auth/google/success?redirect=${encodedRedirectURL}`;
-  console.log("CALLBACK_URL:", CALLBACK_URL);
+
   const BETTER_AUTH_URL = process.env.BETTER_AUTH_URL;
   res.render("google_login", {
     CALLBACK_URL,
@@ -20,8 +52,6 @@ const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
   const redirectUrl = (req.query.redirect as string) || "/dashboard";
 
   const sessonToken = req.cookies["better-auth.session_token"];
-
-  console.log("Session Token:", sessonToken);
 
   if (!sessonToken) {
     return sendResponse(res, {
@@ -57,4 +87,6 @@ const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
 export const authController = {
   googleLogin,
   googleLoginSuccess,
+  Register,
+  Login,
 };

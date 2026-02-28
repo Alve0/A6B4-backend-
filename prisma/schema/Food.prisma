@@ -1,13 +1,13 @@
 model Category {
     id    String @id @default(uuid(7))
-    title String @db.VarChar(100)
+    title String @unique @db.VarChar(100)
 
     food Food[]
 
-    createdAt DateTime @db.Timestamptz()
-    updatedAt DateTime @db.Timestamptz()
+    createdAt DateTime @default(now()) @db.Timestamptz()
+    updatedAt DateTime @updatedAt @db.Timestamptz()
 
-    @@index([id])
+    @@index([id, title])
     @@map("category")
 }
 
@@ -22,8 +22,8 @@ model Food {
 
     cart Cart[]
 
-    createdAt DateTime @db.Timestamptz()
-    updatedAt DateTime @db.Timestamptz()
+    createdAt DateTime @default(now()) @db.Timestamptz()
+    updatedAt DateTime @updatedAt @db.Timestamptz()
 
     @@index([id])
     @@map("food")

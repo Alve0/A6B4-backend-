@@ -1,5 +1,9 @@
 import { Request, Response } from "express";
-import { catchAsync, sendResponse } from "../../lib/utils";
+import {
+  catchAsync,
+  sendResponse,
+  setBetterAuthSessionCookie,
+} from "../../lib/utils";
 import { authService } from "./auth.service";
 
 import { auth } from "../../lib/auth";
@@ -17,22 +21,28 @@ const Register = catchAsync(async (req: Request, res: Response) => {
       message: "Failed to register user",
     });
   }
+  const cookieUpdate = await setBetterAuthSessionCookie(
+    res,
+    result.token as string,
+  );
   sendResponse(res, {
     httpStatusCode: 200,
     success: true,
     message: "User registered successfully",
-    data: result,
+    data: { ...result, cookieUpdate },
   });
 });
 
 const Login = catchAsync(async (req: Request, res: Response) => {
   const data: ILoginData = req.body;
   const result = await authService.Login(data);
+
+  const cookieUpdate = await setBetterAuthSessionCookie(res, result.token);
   sendResponse(res, {
     httpStatusCode: 200,
     success: true,
     message: "User logged in successfully",
-    data: result,
+    data: { ...result, cookieUpdate },
   });
 });
 
@@ -75,7 +85,7 @@ const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
     });
   }
 
-  const result = await authService.GoogleLogin(sesson);
+  const result = await authService.GoogleLogin(sesson as any);
 
   const isValidRedirectPath =
     redirectUrl.startsWith("/") && !redirectUrl.startsWith("//");

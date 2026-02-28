@@ -30,7 +30,7 @@ model Session {
     user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([token])
-    @@index([userId])
+    @@index([userId, token])
     @@map("session")
 }
 

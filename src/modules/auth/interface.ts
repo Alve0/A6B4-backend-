@@ -34,6 +34,7 @@ export interface ILoginData {
 }
 
 export interface ISessionWithUser {
+  token: string;
   session: ISession;
   user: IUser;
 }

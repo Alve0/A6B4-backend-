@@ -1,7 +1,12 @@
-import { string } from "better-auth";
 import { auth } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
-import { ILoginData, IRegisterData, ISessionWithUser } from "./interface";
+import {
+  ILoginData,
+  IProvider,
+  IRegisterData,
+  ISessionWithUser,
+} from "./interface";
+import { ROLE } from "../../generated/prisma/enums";
 
 const Register = async (data: IRegisterData) => {
   try {
@@ -75,8 +80,54 @@ const Login = async (paylord: ILoginData) => {
   }
 };
 
+const providerRegister = async (data: IProvider) => {
+  try {
+    const createProveder = await prisma.provider.create({
+      data: {
+        title: data.title,
+        discription: data.discription,
+        logo_image: data.logo_image,
+        banner_image: data.banner_image,
+        address: data.address,
+        phone: data.phone,
+        userId: data.userId,
+      },
+    });
+
+    const removeCustomer = await prisma.customer.delete({
+      where: {
+        userId: data.userId,
+      },
+    });
+
+    const updateUserRole = await prisma.user.update({
+      where: {
+        id: data.userId,
+      },
+      data: {
+        role: ROLE.provider,
+      },
+    });
+    if (!removeCustomer) {
+      throw new Error("Customer did not deleted successfully");
+    }
+    if (!updateUserRole) {
+      throw new Error("Failed to update user role");
+    }
+
+    if (!createProveder.id) {
+      throw new Error("Failed to create provider");
+    }
+
+    return createProveder;
+  } catch (error: any) {
+    throw new Error(error.message || "Provider registration failed");
+  }
+};
+
 export const authService = {
   GoogleLogin,
   Register,
   Login,
+  providerRegister,
 };

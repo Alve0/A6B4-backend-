@@ -9,6 +9,7 @@ import { authService } from "./auth.service";
 import { auth } from "../../lib/auth";
 
 import { ILoginData, IRegisterData } from "./interface";
+import { prisma } from "../../lib/prisma";
 
 const Register = catchAsync(async (req: Request, res: Response) => {
   const data: IRegisterData = req.body;
@@ -94,9 +95,46 @@ const googleLoginSuccess = catchAsync(async (req: Request, res: Response) => {
   res.redirect(`${process.env.ORIGIN}${finalRedirectPath}`);
 });
 
+const providerRegister = catchAsync(async (req: Request, res: Response) => {
+  let data = req.body;
+
+  const sesson = await prisma.session.findUnique({
+    where: {
+      token: (req as any).cookies?.["better-auth.session_token"],
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  console.log("Session found:", sesson);
+
+  const existingUser = await prisma.user.findUnique({
+    where: { id: sesson?.user?.id },
+  });
+
+  if (!existingUser) {
+    sendResponse(res, {
+      httpStatusCode: 400,
+      success: false,
+      message: "User not found",
+    });
+    return;
+  }
+  data = { ...data, userId: existingUser.id };
+  const result = await authService.providerRegister(data);
+  sendResponse(res, {
+    httpStatusCode: 200,
+    success: true,
+    message: "Provider registered successfully",
+    data: result,
+  });
+});
+
 export const authController = {
   googleLogin,
   googleLoginSuccess,
   Register,
   Login,
+  providerRegister,
 };

@@ -11,12 +11,6 @@ export const requireRole =
         (req as any).cookies?.["better-auth.session_token"] ||
         (req.headers.cookie || "").replace("better-auth.session_token=", "");
 
-      const sessionToken = await auth.api.getSession({
-        headers: {
-          cookie: `better-auth.session_token=${cookieToken}`,
-        },
-      });
-
       const session = await prisma.session.findUnique({
         where: { token: cookieToken },
       });
@@ -35,6 +29,7 @@ export const requireRole =
           .status(401)
           .json({ message: "Unauthorized because user not found" });
       }
+ 
 
       if (!roles.includes(user.role as ROLE)) {
         return res.status(403).json({ message: "Forbidden" });

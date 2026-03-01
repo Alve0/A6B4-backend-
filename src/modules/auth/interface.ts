@@ -33,6 +33,16 @@ export interface ILoginData {
   callbackURL?: string;
 }
 
+export interface IProvider {
+  title: string;
+  discription: string;
+  logo_image: string;
+  banner_image: string;
+  address: string;
+  phone: string;
+  userId: string;
+}
+
 export interface ISessionWithUser {
   token: string;
   session: ISession;

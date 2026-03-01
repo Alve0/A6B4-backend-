@@ -20,7 +20,9 @@ model Food {
     category    Category @relation(fields: [category_id], references: [id])
     category_id String
 
-    cart Cart[]
+    cart       Cart[]
+    provider   Provider @relation(fields: [providerId], references: [id])
+    providerId String
 
     createdAt DateTime @default(now()) @db.Timestamptz()
     updatedAt DateTime @updatedAt @db.Timestamptz()

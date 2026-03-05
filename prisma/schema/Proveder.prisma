@@ -8,7 +8,7 @@ model Provider {
     banner_image String   @db.VarChar(100)
     address      String   @db.VarChar(100)
     phone        String   @unique @db.VarChar(50)
-    status       STATUS   @default(PENDING)
+    status       STATUS   @default(APPROVED)
     cart         Cart[]
     food         Food[]
     createdAt    DateTime @default(now()) @db.Timestamptz()

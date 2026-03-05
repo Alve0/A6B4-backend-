@@ -12,21 +12,22 @@ model Category {
 }
 
 model Food {
-    id          String   @id @default(uuid())
-    title       String   @db.VarChar(100)
-    discription String   @db.VarChar(500)
-    image       String   @db.VarChar(100)
-    price       Float    @db.Real
-    category    Category @relation(fields: [category_id], references: [id])
-    category_id String
+    id          String @id @default(uuid())
+    title       String @db.VarChar(100)
+    description String @db.VarChar(500)
+    image       String @db.VarChar(100)
+    price       Float  @db.Real
 
-    cart       Cart[]
+    category   Category @relation(fields: [categoryId], references: [id])
+    categoryId String
+
     provider   Provider @relation(fields: [providerId], references: [id])
     providerId String
+
+    cart Cart[]
 
     createdAt DateTime @default(now()) @db.Timestamptz()
     updatedAt DateTime @updatedAt @db.Timestamptz()
 
-    @@index([id])
     @@map("food")
 }

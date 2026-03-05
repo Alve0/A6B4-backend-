@@ -1,3 +1,4 @@
+import { get } from "node:http";
 import { prisma } from "../../lib/prisma";
 import { FoodCategoryType } from "./food.interface";
 
@@ -45,6 +46,81 @@ const createFoodCategory = async (categoryData: FoodCategoryType) => {
   }
 };
 
+const getAllFoodCategories = async () => {
+  try {
+    const result = await prisma.category.findMany();
+    if (!result) {
+      throw new Error("Failed to get food categories");
+    }
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to get food categories");
+  }
+};
+
+const updateFoodCategory = async (
+  id: string,
+  categoryData: FoodCategoryType,
+) => {
+  try {
+    const title = categoryData.title.toLowerCase();
+
+    const existingCategory = await prisma.category.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existingCategory) {
+      throw new Error("Food category not found");
+    }
+
+    const result = await prisma.category.update({
+      where: {
+        id: id,
+      },
+      data: {
+        title: title,
+      },
+    });
+    if (!result) {
+      throw new Error("Failed to update food category");
+    }
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to update food category");
+  }
+};
+
+const deleteFoodCategory = async (id: string) => {
+  try {
+    const existingCategory = await prisma.category.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!existingCategory) {
+      throw new Error("Food category not found");
+    }
+
+    const result = await prisma.category.delete({
+      where: {
+        id: id,
+      },
+    });
+    if (!result) {
+      throw new Error("Failed to delete food category");
+    }
+    return result;
+  } catch (error: any) {
+    throw new Error(error.message || "Failed to delete food category");
+  }
+};
+
 export const FoodService = {
   createFoodCategory,
+  getAllFoodCategories,
+  updateFoodCategory,
+  deleteFoodCategory,
 };
